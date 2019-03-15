@@ -2679,15 +2679,21 @@ function evert_arr(obj) {
 }
 
 var basedate = new Date(1899, 11, 30, 0, 0, 0); // 2209161600000
-var dnthresh = basedate.getTime() + (getTimezoneOffsetMS(new Date()) - getTimezoneOffsetMS(basedate));
 function datenum(v, date1904) {
 	var epoch = v.getTime();
 	if(date1904) epoch -= 1462*24*60*60*1000;
+	var dnthresh = basedate.getTime() + (getTimezoneOffsetMS(v) - getTimezoneOffsetMS(basedate));
 	return (epoch - dnthresh) / (24 * 60 * 60 * 1000);
 }
+var refdate = new Date();
+var dnthresh = basedate.getTime() + (getTimezoneOffsetMS(refdate) - getTimezoneOffsetMS(basedate));
+var refoffset = getTimezoneOffsetMS(refdate);
 function numdate(v) {
 	var out = new Date();
 	out.setTime(v * 24 * 60 * 60 * 1000 + dnthresh);
+	if (getTimezoneOffsetMS(out) !== refoffset) {
+		out.setTime(out.getTime() + getTimezoneOffsetMS(out) - refoffset);
+	}
 	return out;
 }
 
